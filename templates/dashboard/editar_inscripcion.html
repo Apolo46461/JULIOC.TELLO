@@ -1,0 +1,112 @@
+{% extends "base_improved.html" %}
+
+{% block title %}Editar Inscripción - Dashboard Administrativo{% endblock %}
+
+{% block page_title %}Editar Inscripción #{{ inscripcion.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Editar Detalles de Inscripción
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nombres" class="form-label">Nombres</label>
+                                <input type="text" class="form-control" id="nombres" name="nombres" value="{{ inscripcion.nombres }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="apellidos" class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ inscripcion.apellidos }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ inscripcion.email }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ inscripcion.telefono }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="dni" class="form-label">DNI</label>
+                                <input type="text" class="form-control" id="dni" name="dni" value="{{ inscripcion.dni }}" required maxlength="8">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="programa" class="form-label">Programa</label>
+                                <input type="text" class="form-control" id="programa" name="programa" value="{{ inscripcion.programa }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">Mensaje</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="3">{{ inscripcion.mensaje or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-select" id="estado" name="estado" required>
+                                <option value="pendiente" {% if inscripcion.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                <option value="aprobado" {% if inscripcion.estado == 'aprobado' %}selected{% endif %}>Aprobado</option>
+                                <option value="rechazado" {% if inscripcion.estado == 'rechazado' %}selected{% endif %}>Rechazado</option>
+                                <option value="revisado" {% if inscripcion.estado == 'revisado' %}selected{% endif %}>Revisado</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('inscripciones.listar_inscripciones') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver a Lista
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Actualizar Inscripción
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Información de la Inscripción
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>ID de Inscripción:</strong> {{ inscripcion.id }}</p>
+                            <p><strong>Fecha de Registro:</strong> {{ inscripcion.fecha.strftime('%d/%m/%Y %H:%M') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Estado Actual:</strong>
+                                {% if inscripcion.estado == 'pendiente' %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% elif inscripcion.estado == 'aprobado' %}
+                                    <span class="badge bg-success">Aprobado</span>
+                                {% elif inscripcion.estado == 'rechazado' %}
+                                    <span class="badge bg-danger">Rechazado</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ inscripcion.estado }}</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Última Actualización:</strong> {{ inscripcion.fecha.strftime('%d/%m/%Y %H:%M') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

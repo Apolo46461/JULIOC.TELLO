@@ -1,0 +1,144 @@
+{% extends "base_improved.html" %}
+{% block title %}Editar Proveedor - CETPRO Julio C. Tello{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+    .form-section { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .btn-back { background: #6c757d; color: white; }
+    .btn-back:hover { background: #5a6268; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Proveedor de Servicio
+                </h2>
+                <a href="{{ url_for('admin_proveedores') }}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Proveedores
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Datos del Proveedor</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_proveedores_edit', id=proveedor.id) }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre del Proveedor *</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ proveedor.nombre }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contacto" class="form-label">Contacto *</label>
+                                    <input type="text" class="form-control" id="contacto" name="contacto" value="{{ proveedor.contacto }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="especialidad" class="form-label">Especialidad *</label>
+                                    <select class="form-select" id="especialidad" name="especialidad" required>
+                                        <option value="">Seleccionar especialidad...</option>
+                                        <option value="Mantenimiento Eléctrico" {% if proveedor.especialidad == 'Mantenimiento Eléctrico' %}selected{% endif %}>Mantenimiento Eléctrico</option>
+                                        <option value="Mantenimiento Mecánico" {% if proveedor.especialidad == 'Mantenimiento Mecánico' %}selected{% endif %}>Mantenimiento Mecánico</option>
+                                        <option value="Reparación de Equipos Informáticos" {% if proveedor.especialidad == 'Reparación de Equipos Informáticos' %}selected{% endif %}>Reparación de Equipos Informáticos</option>
+                                        <option value="Limpieza y Suministros" {% if proveedor.especialidad == 'Limpieza y Suministros' %}selected{% endif %}>Limpieza y Suministros</option>
+                                        <option value="Seguridad y Vigilancia" {% if proveedor.especialidad == 'Seguridad y Vigilancia' %}selected{% endif %}>Seguridad y Vigilancia</option>
+                                        <option value="Otros" {% if proveedor.especialidad == 'Otros' %}selected{% endif %}>Otros</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ proveedor.telefono }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ proveedor.email }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ciudad" class="form-label">Ciudad</label>
+                                    <input type="text" class="form-control" id="ciudad" name="ciudad" value="{{ proveedor.ciudad }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" name="direccion" value="{{ proveedor.direccion }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4">{{ proveedor.descripcion }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="estado" class="form-label">Estado</label>
+                                    <select class="form-select" id="estado" name="estado">
+                                        <option value="activo" {% if proveedor.estado == 'activo' %}selected{% endif %}>Activo</option>
+                                        <option value="inactivo" {% if proveedor.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin_proveedores') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Actualizar Proveedor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-focus en el primer campo
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('nombre').focus();
+    });
+</script>
+
+{% endblock %}

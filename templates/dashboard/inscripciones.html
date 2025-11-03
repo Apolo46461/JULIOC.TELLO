@@ -1,0 +1,248 @@
+{% extends "base_improved.html" %}
+
+{% block title %}Gestión de Inscripciones - Dashboard Administrativo{% endblock %}
+
+{% block page_title %}Gestión de Inscripciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Inscripciones Recibidas
+                </h2>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-info fs-6">{{ inscripciones|length }} Total</span>
+                    <a href="{{ url_for('listar_inscripciones') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-sync-alt me-1"></i>Actualizar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select name="estado" id="estado" class="form-select">
+                                <option value="">Todas</option>
+                                <option value="pendiente">Pendientes</option>
+                                <option value="aprobado">Aprobadas</option>
+                                <option value="rechazado">Rechazadas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="programa" class="form-label">Programa</label>
+                            <input type="text" name="programa" id="programa" class="form-control" placeholder="Filtrar por programa">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fecha_desde" class="form-label">Desde</label>
+                            <input type="date" name="fecha_desde" id="fecha_desde" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fecha_hasta" class="form-label">Hasta</label>
+                            <input type="date" name="fecha_hasta" id="fecha_hasta" class="form-control">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Inscripciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Lista de Inscripciones
+                    </h6>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('listar_inscripciones', export='csv') }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-file-csv me-1"></i>Exportar CSV
+                        </a>
+                        <a href="{{ url_for('listar_inscripciones', export='pdf') }}" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-file-pdf me-1"></i>Exportar PDF
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombres Completos</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>DNI</th>
+                                    <th>Programa</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inscripcion in inscripciones %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ inscripcion.id }}</span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ inscripcion.nombres }} {{ inscripcion.apellidos }}</strong>
+                                        {% if inscripcion.mensaje %}
+                                        <br><small class="text-muted">{{ inscripcion.mensaje[:50] }}...</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="mailto:{{ inscripcion.email }}" class="text-decoration-none">
+                                            {{ inscripcion.email }}
+                                        </a>
+                                    </td>
+                                    <td>{{ inscripcion.telefono }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ inscripcion.dni }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ inscripcion.programa }}</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ inscripcion.fecha.strftime('%d/%m/%Y %H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        {% if inscripcion.estado == 'pendiente' %}
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                        {% elif inscripcion.estado == 'aprobado' %}
+                                            <span class="badge bg-success">Aprobado</span>
+                                        {% elif inscripcion.estado == 'rechazado' %}
+                                            <span class="badge bg-danger">Rechazado</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ inscripcion.estado }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('editar_inscripcion', id=inscripcion.id) }}" class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('aprobar_inscripcion', id=inscripcion.id) }}" style="display: inline;">
+                                                <button type="submit" class="btn btn-outline-success" onclick="return confirm('¿Aprobar esta inscripción?')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('rechazar_inscripcion', id=inscripcion.id) }}" style="display: inline;">
+                                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Rechazar esta inscripción?')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                            <button class="btn btn-outline-secondary" onclick="verDetalles({{ inscripcion.id }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas de Inscripciones -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4>{{ este_mes }}</h4>
+                    <p class="mb-0">Este mes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4>{{ aprobadas }}</h4>
+                    <p class="mb-0">Aprobadas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-warning text-dark">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4>{{ pendientes }}</h4>
+                    <p class="mb-0">Pendientes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-danger text-white">
+                <div class="card-body">
+                    <i class="fas fa-times-circle fa-2x mb-2"></i>
+                    <h4>{{ rechazadas }}</h4>
+                    <p class="mb-0">Rechazadas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles de inscripción -->
+<div class="modal fade" id="detallesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Detalles de Inscripción</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detallesBody">
+                <!-- Contenido dinámico cargado con JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verDetalles(id) {
+    // Cargar detalles vía AJAX o mostrar modal con datos
+    fetch(`/inscripciones/${id}/detalles`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('detallesBody').innerHTML = `
+                <p><strong>ID:</strong> ${data.id}</p>
+                <p><strong>Nombres:</strong> ${data.nombres} ${data.apellidos}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Teléfono:</strong> ${data.telefono}</p>
+                <p><strong>DNI:</strong> ${data.dni}</p>
+                <p><strong>Programa:</strong> ${data.programa}</p>
+                <p><strong>Fecha:</strong> ${data.fecha}</p>
+                <p><strong>Estado:</strong> <span class="badge bg-${data.estado === 'aprobado' ? 'success' : data.estado === 'rechazado' ? 'danger' : 'warning'}">${data.estado}</span></p>
+                ${data.mensaje ? `<p><strong>Mensaje:</strong> ${data.mensaje}</p>` : ''}
+            `;
+            new bootstrap.Modal(document.getElementById('detallesModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cargar detalles de la inscripción');
+        });
+}
+</script>
+{% endblock %}

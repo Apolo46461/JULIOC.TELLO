@@ -1,0 +1,1127 @@
+{% extends "base_landing.html" %}
+{% block title %}I.E. CETPRO JULIO C. TELLO - Centro de Educación Técnica Productiva{% endblock %}
+
+{# Load CSS for landing page - ensuring proper loading #}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+<style>
+/* Additional styles to ensure proper loading */
+.hero-section {
+    color: #fff !important;
+    min-height: 480px;
+    position: relative;
+    z-index: 1;
+}
+/* Validation styles */
+.is-invalid {
+    border-color: #dc3545;
+}
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875em;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Responsive carousel caption */
+.carousel-caption {
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: left;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.hero-content {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    max-width: 50%;
+}
+
+/* Zoom effect for carousel */
+.carousel-item {
+    transition: opacity 4s ease-in-out !important, transform 4s ease-in-out !important;
+    transform: scale(0.8);
+}
+
+.carousel-item.active {
+    transform: scale(1);
+}
+
+/* Floating text styles */
+.floating-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    width: 100%;
+    max-width: 90%;
+}
+
+.floating-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    color: #1e3a8a !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.floating-subtitle {
+    font-size: 2rem;
+    font-weight: 300;
+    margin: 0;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .floating-title {
+        font-size: 2rem;
+    }
+    .floating-subtitle {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .carousel-caption h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+    }
+    .carousel-caption p {
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+    .carousel-caption .btn {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+    .carousel-caption .exam-date {
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- JavaScript for form validation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('inscripcionForm');
+    const dniInput = document.getElementById('dni');
+    const telefonoInput = document.getElementById('telefono');
+    const emailInput = document.getElementById('email');
+
+    // Function to validate DNI (8 digits)
+    function validateDNI() {
+        const value = dniInput.value.trim();
+        const isValid = /^\d{8}$/.test(value);
+        dniInput.classList.toggle('is-invalid', !isValid);
+        return isValid;
+    }
+
+    // Function to validate phone (9 digits starting with 9)
+    function validateTelefono() {
+        const value = telefonoInput.value.trim();
+        const isValid = /^9\d{8}$/.test(value);
+        telefonoInput.classList.toggle('is-invalid', !isValid);
+        return isValid;
+    }
+
+    // Limit input length for DNI
+    dniInput.addEventListener('input', function() {
+        if (this.value.length > 8) {
+            this.value = this.value.slice(0, 8);
+        }
+        validateDNI();
+    });
+
+    // Limit input length for telefono
+    telefonoInput.addEventListener('input', function() {
+        if (this.value.length > 9) {
+            this.value = this.value.slice(0, 9);
+        }
+        validateTelefono();
+    });
+
+    // Function to validate email
+    function validateEmail() {
+        const value = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValid = emailRegex.test(value);
+        emailInput.classList.toggle('is-invalid', !isValid);
+        return isValid;
+    }
+
+    // Add event listeners for real-time validation
+    dniInput.addEventListener('input', validateDNI);
+    telefonoInput.addEventListener('input', validateTelefono);
+    emailInput.addEventListener('input', validateEmail);
+
+    // Form submit validation
+    form.addEventListener('submit', function(e) {
+        const isDNIValid = validateDNI();
+        const isTelefonoValid = validateTelefono();
+        const isEmailValid = validateEmail();
+
+        if (!isDNIValid || !isTelefonoValid || !isEmailValid) {
+            e.preventDefault();
+            // Show modal if not already shown
+            const modal = new bootstrap.Modal(document.getElementById('inscripcionModal'));
+            modal.show();
+            return false;
+        }
+    });
+});
+</script>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top" style="z-index: 1030;">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo CETPRO" style="max-width: 60px; margin-right: 10px;">
+            <span class="fw-bold text-primary">CETPRO JULIO C. TELLO</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#sobre-nosotros" role="button" data-bs-toggle="dropdown">
+                        Nosotros
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#sobre-nosotros">🏛️ Misión y Visión</a></li>
+                        <li><a class="dropdown-item" href="#sobre-nosotros">📚 Historia</a></li>
+                        <li><a class="dropdown-item" href="#contacto">🏢 Instalaciones</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#programas" role="button" data-bs-toggle="dropdown">
+                        Programas de Estudios
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#programas" data-bs-toggle="modal" data-bs-target="#esteticaModal">💄 Estética Personal</a></li>
+                        <li><a class="dropdown-item" href="#programas" data-bs-toggle="modal" data-bs-target="#hosteleriaModal">👨‍🍳 Hostelería y Turismo</a></li>
+                        <li><a class="dropdown-item" href="#programas" data-bs-toggle="modal" data-bs-target="#artesaniaModal">🎨 Artesanía y Manualidades</a></li>
+                        <li><a class="dropdown-item" href="#programas" data-bs-toggle="modal" data-bs-target="#textilesModal">✂️ Textiles y Confecciones</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#inscripcion" role="button" data-bs-toggle="dropdown">
+                        Admisión y Matrícula
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#inscripcion">📝 Proceso de Admisión</a></li>
+                        <li><a class="dropdown-item" href="#inscripcion">📋 Requisitos</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#inscripcionModal">🌐 Inscripción en Línea</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Servicios
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#sobre-nosotros">📰 Noticias</a></li>
+                        <li><a class="dropdown-item" href="#sobre-nosotros">🎭 Eventos</a></li>
+                        <li><a class="dropdown-item" href="#contacto">💼 Bolsa de Trabajo</a></li>
+                        <li><a class="dropdown-item" href="#sobre-nosotros">📊 Proyectos</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contacto">Contáctanos</a>
+                </li>
+            </ul>
+            <div class="d-flex">
+                <a href="#inscripcion" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#inscripcionModal">
+                    <i class="fas fa-user-plus"></i> Inscríbete ahora
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section with Full Width Slider -->
+<section class="hero-section py-0" style="margin-top: 76px;">
+    <div class="container-fluid px-0">
+        <!-- Slider principal con 3 imágenes -->
+        <div id="mainSlider" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="false">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{{ url_for('static', filename='images/Slider_confecciones.jpeg') }}"
+                         class="d-block w-100"
+                         style="width: 100%; height: 100%; object-fit: cover;"
+                         alt="CETPRO Julio C. Tello - Estética Personal">
+                    <div class="floating-text">
+                        <div class="floating-content">
+                            <h1 class="floating-title">
+                                Bienvenido al CETPRO Julio C. Tello
+                            </h1>
+                            <p class="floating-subtitle">
+                                Centro de Educación Técnica Productiva
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="{{ url_for('static', filename='images/Slider_peluquería.jpeg') }}"
+                         class="d-block w-100"
+                         style="width: 100%; height: 100%; object-fit: cover;"
+                         alt="CETPRO Julio C. Tello - Artesanía y Manualidades">
+                    <div class="floating-text">
+                        <div class="floating-content">
+                            <h1 class="floating-title">
+                                Bienvenido al CETPRO Julio C. Tello
+                            </h1>
+                            <p class="floating-subtitle">
+                                Centro de Educación Técnica Productiva
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="{{ url_for('static', filename='images/Slider_manualidades.jpeg') }}"
+                         class="d-block w-100"
+                         style="width: 100%; height: 100%; object-fit: cover;"
+                         alt="CETPRO Julio C. Tello - Textiles y Confecciones">
+                    <div class="floating-text">
+                        <div class="floating-content">
+                            <h1 class="floating-title">
+                                Bienvenido al CETPRO Julio C. Tello
+                            </h1>
+                            <p class="floating-subtitle">
+                                Centro de Educación Técnica Productiva
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+
+
+    </div>
+</section>
+<!-- Sobre Nosotros - CETPRO Julio C. Tello -->
+<section class="py-5 bg-light" id="sobre-nosotros">
+    <div class="container">
+        <h2 class="text-center mb-4">Sobre Nosotros</h2>
+
+        <!-- Identidad del CETPRO -->
+        <div class="row g-4 justify-content-center mb-5">
+            <div class="col-lg-12">
+                <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                    <div class="card-body p-4">
+                        <h4 class="card-title text-primary mb-3">
+                            <i class="fas fa-id-card me-2"></i>Identidad del CETPRO "Julio C. Tello"
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mb-3"><strong>El CETPRO "Julio C. Tello"</strong> de la Urb. El Carmen Panamericana Sur Km 301 San Joaquín se rige por la normatividad vigente del sector Educación en su entorno por el proyecto Regional concertado de Ica (PERCI), PAT Plan de Acompañamiento y Monitoreo y Reglamento interno; PCI, así como por el código de ética magisterial.</p>
+                                <p class="mb-3">El estilo de una gestión democrática de participación plena y de liderazgo compartido que favorece el clima institucional y la productividad académica.</p>
+                                <p class="mb-3"><strong>Brinda servicios educativos</strong> a las personas mayores de 14 años de ambos sexos, que desean insertarse o reinsertarse en el mercado laboral, con un nivel competitivo receptivo y sostenido en un puesto de trabajo.</p>
+                                <p class="mb-3"><strong>Cobertura anual:</strong> aproximadamente 350 estudiantes en turno diurno con un potencial real profesional de 01 Director, 04 Docentes, 2 Personal Administrativo (Guardián, limpieza).</p>
+                                <p class="mb-3"><strong>Infrastructura:</strong> terreno de 1,200 metros construidos con 04 aulas talleres equipados, dirección, 02 servicios higiénicos, 01 patio amplio y áreas verdes.</p>
+
+                                <!-- Perfil Institucional -->
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <h6 class="text-primary mb-2"><i class="fas fa-star me-1"></i>Perfil Institucional</h6>
+                                    <p class="mb-2"><em>"Ser una Institución modelo de Gestión Pedagógica e Institucional de la localidad, que sea un espacio importante en la comunidad para el desarrollo de la misma."</em></p>
+                                    <ul class="mb-0 small">
+                                        <li>Promover y desarrollar nuevas alternativas educativas, técnicas y laborales</li>
+                                        <li>Desarrollar procesos de gestión empresarial fomentando la micro y pequeña empresa</li>
+                                        <li>Orientar permanentemente a las instituciones de la comunidad</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="bg-primary text-white p-3 rounded mb-3">
+                                    <h5 class="mb-2">NUESTRO LEMA</h5>
+                                    <p class="mb-0 fw-bold">"FORMAR ESTUDIANTES COMPETENTES, PARA INSERTARLOS EN EL MERCADO LABORAL"</p>
+                                </div>
+
+                                <!-- Valores Institucionales -->
+                                <div class="bg-info text-white p-3 rounded">
+                                    <h6 class="mb-2"><i class="fas fa-heart me-1"></i>Nuestros Valores</h6>
+                                    <ul class="list-unstyled mb-0 small">
+                                        <li>• Respeto y solidaridad</li>
+                                        <li>• Responsabilidad</li>
+                                        <li>• Creatividad e innovación</li>
+                                        <li>• Justicia y equidad</li>
+                                        <li>• Compromiso social</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Misión, Visión y Objetivos -->
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-graduation-cap text-primary"></i> Misión</h5>
+                        <p class="card-text">Somos una Institución Educativa conformada por docentes altamente calificados que enfrentamos los retos del mundo científico y tecnológico a fin de lograr mejores estándares de calidad educativa. Formamos estudiantes competentes que desarrollan sus capacidades utilizando una metodología activa, respetando sus individualidades y su condición de personas a través de la práctica permanente de valores.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-eye text-info"></i> Visión</h5>
+                        <p class="card-text">Al 2021 nuestra Institución Educativa será líder en la formación integral de los estudiantes y la excelencia educativa; con moderna infraestructura, equipamiento tecnológico y aulas inteligentes que contribuirán a la realización personal y social del hombre para el gran cambio socio económico y cultural de la comunidad y el país.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-bullseye text-success"></i> Objetivos</h5>
+                        <ul class="mb-0">
+                            <li>Construcción de más aulas talleres para doble turno</li>
+                            <li>Ofertar servicios educativos según demanda laboral</li>
+                            <li>Garantizar el servicio mediante acompañamiento docente</li>
+                            <li>Intensificar prácticas profesionales con proyectos productivos</li>
+                            <li>Adecuar programación curricular al Diseño Curricular Básico</li>
+                            <li>Promover formación de pequeñas microempresas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reseña Histórica -->
+        <div class="row g-4 justify-content-center mt-4">
+            <div class="col-lg-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary mb-3">
+                            <i class="fas fa-history me-2"></i>Reseña Histórica
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Creación:</strong> El CETPRO Julio C. Tello fue creado como PRONACAPE mediante Resolución Directoral N° 0132 del 23 de Abril 1986, siendo Director el profesor Máximo Huamán García.</p>
+                                <p class="mb-2"><strong>1988:</strong> Se le encarga la Dirección a la Prof. Luisa Bernaola Paredes</p>
+                                <p class="mb-2"><strong>2002:</strong> Por concurso público se nombra como directora a la Lic. Luisa Aurora Bernaola Paredes</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>2006:</strong> Se convierte de CEO a CETPRO con familias profesionales</p>
+                                <p class="mb-2"><strong>2008:</strong> Se le asigna local propio de 1,200 m²</p>
+                                <p class="mb-2"><strong>2014:</strong> Se inaugura la nueva infraestructura con 03 aulas talleres equipadas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Programas de Estudio -->
+<section class="py-5" id="programas">
+    <div class="container">
+        <h2 class="text-center mb-4">Plan de Estudios - Ciclo Básico por Familia y Especialidad</h2>
+
+        <!-- Título de la sección -->
+        <div class="text-center mb-5">
+            <h4 class="text-primary">Plan de Estudios por Familia Profesional y Especialidad</h4>
+            <p class="lead text-muted">Haz clic en cada especialidad para ver los detalles completos</p>
+        </div>
+
+        <!-- Cards de programas -->
+        <div class="row g-4 justify-content-center">
+            <!-- 1. Estética Personal - Peluquería -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm program-card" data-bs-toggle="modal" data-bs-target="#esteticaModal" style="cursor: pointer; transition: transform 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="program-icon mb-3">
+                            <i class="fas fa-cut fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title text-primary fw-bold">Estética Personal</h5>
+                        <p class="card-text text-muted">Peluquería</p>
+                        <div class="mt-3">
+                            <span class="badge bg-primary">Ver detalles →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Hostelería y Turismo - Pastelería y Panadería -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm program-card" data-bs-toggle="modal" data-bs-target="#hosteleriaModal" style="cursor: pointer; transition: transform 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="program-icon mb-3">
+                            <i class="fas fa-birthday-cake fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title text-warning fw-bold">Hostelería y Turismo</h5>
+                        <p class="card-text text-muted">Pastelería y Panadería</p>
+                        <div class="mt-3">
+                            <span class="badge bg-warning text-dark">Ver detalles →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Artesanía y Manualidades - Manualidades -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm program-card" data-bs-toggle="modal" data-bs-target="#artesaniaModal" style="cursor: pointer; transition: transform 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="program-icon mb-3">
+                            <i class="fas fa-palette fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title text-success fw-bold">Artesanía y Manualidades</h5>
+                        <p class="card-text text-muted">Manualidades</p>
+                        <div class="mt-3">
+                            <span class="badge bg-success">Ver detalles →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Textiles y Confecciones - Confecciones Textiles -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm program-card" data-bs-toggle="modal" data-bs-target="#textilesModal" style="cursor: pointer; transition: transform 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="program-icon mb-3">
+                            <i class="fas fa-tshirt fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title text-info fw-bold">Textiles y Confecciones</h5>
+                        <p class="card-text text-muted">Confecciones Textiles</p>
+                        <div class="mt-3">
+                            <span class="badge bg-info">Ver detalles →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="row g-4 justify-content-center mt-5">
+            <div class="col-md-10">
+                <div class="card shadow-sm border-primary">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-info-circle me-2"></i>Información General de Nuestros Programas
+                        </h5>
+                        <p class="card-text mb-4">
+                            Nuestros programas están diseñados para proporcionar una formación integral que combina
+                            teoría y práctica, preparando a los estudiantes para insertarse exitosamente en el mercado laboral.
+                        </p>
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <h6>Duración</h6>
+                                <p class="small mb-0">6 meses a 1 año</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="fas fa-certificate fa-2x text-success mb-2"></i>
+                                <h6>Certificación</h6>
+                                <p class="small mb-0">Oficial del MINEDU</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="fas fa-briefcase fa-2x text-info mb-2"></i>
+                                <h6>Prácticas</h6>
+                                <p class="small mb-0">En empresas reales</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modals para cada especialidad -->
+<!-- Modal Estética Personal -->
+<div class="modal fade" id="esteticaModal" tabindex="-1" aria-labelledby="esteticaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="esteticaModalLabel">
+                    <i class="fas fa-cut me-2"></i>Estética Personal - Peluquería
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-primary">Módulos de Estudio:</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Corte de cabello</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Ondulaciones</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Tinturación</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Peinados</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="collage-container position-relative" style="height: 200px;">
+                            <img src="{{ url_for('static', filename='images/Peluquería.jpeg') }}" alt="Estética Personal - Peluquería 1" class="img-fluid rounded position-absolute" style="width: 48%; height: 48%; object-fit: cover; top: 2%; left: 2%; z-index: 2; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Peluquería.jpeg') }}" data-alt="Estética Personal - Peluquería 1">
+                            <img src="{{ url_for('static', filename='images/Peluquería2.jpeg') }}" alt="Estética Personal - Peluquería 2" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 50%; left: 5%; z-index: 1; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Peluquería2.jpeg') }}" data-alt="Estética Personal - Peluquería 2">
+                            <img src="{{ url_for('static', filename='images/Peluquería3.jpeg') }}" alt="Estética Personal - Peluquería 3" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 5%; right: 5%; z-index: 3; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Peluquería3.jpeg') }}" data-alt="Estética Personal - Peluquería 3">
+                            <img src="{{ url_for('static', filename='images/Peluquería4.jpeg') }}" alt="Estética Personal - Peluquería 4" class="img-fluid rounded position-absolute" style="width: 42%; height: 42%; object-fit: cover; bottom: 2%; right: 10%; z-index: 1; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Peluquería4.jpeg') }}" data-alt="Estética Personal - Peluquería 4">
+                        </div>
+                        <p class="text-muted mt-2">Formación completa en técnicas de peluquería profesional</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p><strong>Descripción:</strong> Aprende las técnicas profesionales de corte, peinado, coloración y tratamientos capilares para desarrollar una carrera exitosa en el mundo de la belleza y la estética personal.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#inscripcion" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inscripcionModal">Inscribirme en este programa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Hostelería y Turismo -->
+<div class="modal fade" id="hosteleriaModal" tabindex="-1" aria-labelledby="hosteleriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="hosteleriaModalLabel">
+                    <i class="fas fa-birthday-cake me-2"></i>Hostelería y Turismo - Pastelería y Panadería
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-warning">Módulos de Estudio:</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Elaboración de: Productos de pastelería</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Elaboración de productos de panadería</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Acondicionamiento del área de cocina y manipulación de alimentos</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Técnicas culinarias</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="collage-container position-relative" style="height: 200px;">
+                            <img src="{{ url_for('static', filename='images/Hostelería.jpeg') }}" alt="Hostelería y Turismo - Pastelería y Panadería 1" class="img-fluid rounded position-absolute" style="width: 50%; height: 50%; object-fit: cover; top: 0; left: 0; z-index: 2; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Hostelería.jpeg') }}" data-alt="Hostelería y Turismo - Pastelería y Panadería 1">
+                            <img src="{{ url_for('static', filename='images/Hostelería2.jpeg') }}" alt="Hostelería y Turismo - Pastelería y Panadería 2" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 45%; left: 10%; z-index: 1; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Hostelería2.jpeg') }}" data-alt="Hostelería y Turismo - Pastelería y Panadería 2">
+                            <img src="{{ url_for('static', filename='images/Hostelería3.jpeg') }}" alt="Hostelería y Turismo - Pastelería y Panadería 3" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 5%; right: 0; z-index: 3; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Hostelería3.jpeg') }}" data-alt="Hostelería y Turismo - Pastelería y Panadería 3">
+                        </div>
+                        <p class="text-muted mt-2">Especialización en repostería y panadería profesional</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p><strong>Descripción:</strong> Domina el arte de la pastelería y panadería con técnicas profesionales, desde la elaboración de productos básicos hasta creaciones artísticas, incluyendo manejo higiénico de alimentos y técnicas culinarias especializadas.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#inscripcion" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#inscripcionModal">Inscribirme en este programa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Artesanía y Manualidades -->
+<div class="modal fade" id="artesaniaModal" tabindex="-1" aria-labelledby="artesaniaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="artesaniaModalLabel">
+                    <i class="fas fa-palette me-2"></i>Artesanía y Manualidades - Manualidades
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-success">Módulos de Estudio:</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Decoración de eventos especiales</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Estampados</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Pirograbado</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="collage-container position-relative" style="height: 200px;">
+                            <img src="{{ url_for('static', filename='images/Manualidades.jpeg') }}" alt="Artesanía y Manualidades - Manualidades 1" class="img-fluid rounded position-absolute" style="width: 48%; height: 48%; object-fit: cover; top: 2%; left: 2%; z-index: 2; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Manualidades.jpeg') }}" data-alt="Artesanía y Manualidades - Manualidades 1">
+                            <img src="{{ url_for('static', filename='images/Manualidades2.jpeg') }}" alt="Artesanía y Manualidades - Manualidades 2" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 50%; left: 10%; z-index: 1; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Manualidades2.jpeg') }}" data-alt="Artesanía y Manualidades - Manualidades 2">
+                            <img src="{{ url_for('static', filename='images/Manualidades3.jpeg') }}" alt="Artesanía y Manualidades - Manualidades 3" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 5%; right: 5%; z-index: 3; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Manualidades3.jpeg') }}" data-alt="Artesanía y Manualidades - Manualidades 3">
+                        </div>
+                        <p class="text-muted mt-2">Desarrollo de habilidades artísticas y manuales</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p><strong>Descripción:</strong> Explora tu creatividad a través de técnicas de decoración para eventos, estampado artístico y pirograbado. Aprende a crear piezas únicas y personalizadas para diferentes ocasiones y mercados.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#inscripcion" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inscripcionModal">Inscribirme en este programa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Textiles y Confecciones -->
+<div class="modal fade" id="textilesModal" tabindex="-1" aria-labelledby="textilesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="textilesModalLabel">
+                    <i class="fas fa-tshirt me-2"></i>Textiles y Confecciones - Confecciones Textiles
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-info">Módulos de Estudio:</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Artículos Textiles</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Confección de prendas de vestir de dama</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Confección de prendas de vestir de niños</li>
+                            <li class="list-group-item"><i class="fas fa-check text-success me-2"></i>Confección de prendas de vestir de caballeros</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="collage-container position-relative" style="height: 200px;">
+                            <img src="{{ url_for('static', filename='images/Confecciones.jpeg') }}" alt="Textiles y Confecciones - Confecciones Textiles 1" class="img-fluid rounded position-absolute" style="width: 50%; height: 50%; object-fit: cover; top: 0; left: 0; z-index: 2; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Confecciones.jpeg') }}" data-alt="Textiles y Confecciones - Confecciones Textiles 1">
+                            <img src="{{ url_for('static', filename='images/Confecciones2.jpeg') }}" alt="Textiles y Confecciones - Confecciones Textiles 2" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 45%; left: 10%; z-index: 1; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Confecciones2.jpeg') }}" data-alt="Textiles y Confecciones - Confecciones Textiles 2">
+                            <img src="{{ url_for('static', filename='images/Confecciones3.jpeg') }}" alt="Textiles y Confecciones - Confecciones Textiles 3" class="img-fluid rounded position-absolute" style="width: 45%; height: 45%; object-fit: cover; top: 5%; right: 0; z-index: 3; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Confecciones3.jpeg') }}" data-alt="Textiles y Confecciones - Confecciones Textiles 3">
+                            <img src="{{ url_for('static', filename='images/Confecciones4.jpeg') }}" alt="Textiles y Confecciones - Confecciones Textiles 4" class="img-fluid rounded position-absolute" style="width: 42%; height: 42%; object-fit: cover; bottom: 2%; right: 10%; z-index: 1; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('static', filename='images/Confecciones4.jpeg') }}" data-alt="Textiles y Confecciones - Confecciones Textiles 4">
+                        </div>
+                        <p class="text-muted mt-2">Especialización en diseño y confección textil</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p><strong>Descripción:</strong> Aprende el proceso completo de la industria textil, desde la creación de artículos textiles básicos hasta la confección profesional de prendas de vestir para dama, niños y caballeros, desarrollando habilidades técnicas y de diseño.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#inscripcion" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#inscripcionModal">Inscribirme en este programa</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Admisión y Matrícula -->
+<section class="py-5 bg-light" id="inscripcion">
+    <div class="container">
+        <h2 class="text-center mb-4">Admisión y Matrícula</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-clipboard-list text-primary"></i> Proceso de Admisión</h5>
+                        <ol class="mb-0">
+                            <li>Presentar DNI original y copia</li>
+                            <li>Llenar formulario de inscripción</li>
+                            <li>Presentar certificado de estudios</li>
+                            <li>Pagar derechos de inscripción</li>
+                            <li>Presentar examen de admisión</li>
+                            <li>Entrevista personal</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-check-circle text-success"></i> Requisitos</h5>
+                        <ul class="mb-0">
+                            <li>Ser mayor de 14 años</li>
+                            <li>Documento de identidad vigente</li>
+                            <li>Certificado de estudios secundarios</li>
+                            <li>Fotos tamaño carnet</li>
+                            <li>Certificado médico</li>
+                            <li>Comprobante de pago</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 justify-content-center mt-4">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-calendar-alt text-warning"></i> Próximo Examen de Admisión</h5>
+                        <p class="lead mb-3">15 de Marzo - 9:00 AM</p>
+                        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#inscripcionModal">
+                            <i class="fas fa-edit"></i> Inscribirse en Línea
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Contacto -->
+<section class="py-5 bg-light" id="contacto">
+    <div class="container">
+        <h2 class="text-center mb-4">Contacto</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-5">
+                    <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-map-marker-alt text-primary"></i> Dirección</h5>
+                        <p>Urb. El Carmen Panamericana Sur Km 301 San Joaquín, Ica, Perú</p>
+                        <h5 class="card-title"><i class="fas fa-phone-alt text-success"></i> Teléfonos</h5>
+                        <p>956099016</p>
+                        <h5 class="card-title"><i class="fas fa-envelope text-info"></i> Correo</h5>
+                        <p>cetprojuliotello@gmail.com</p>
+                        <h5 class="card-title"><i class="fas fa-clock text-warning"></i> Horario de Atención</h5>
+                        <p>Lunes a Viernes: 8:00 am - 5:00 pm</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-info-circle text-secondary"></i> Información General</h5>
+                        <p>Somos I.E. CETPRO JULIO C TELLO que ofrece carreras técnicas profesionales con certificación oficial.</p>
+                        <h5 class="card-title"><i class="fas fa-certificate text-success"></i> Certificaciones</h5>
+                        <ul>
+                            <li>Resolución Ministerial Nº 123-2023-MINEDU</li>
+                            <li>ISO 9001:2015 Certificado</li>
+                            <li>Acreditación Nacional</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Footer Information Section -->
+<section class="footer-info py-5" style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); color: #fff;">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Logo Section -->
+            <div class="col-lg-3 col-md-6">
+                <div class="footer-logo text-center mb-4">
+                    <img src="{{ url_for('static', filename='images/logo.jpg') }}"
+                         alt="Logo CETPRO Julio C. Tello"
+                         style="max-width: 120px; margin-bottom: 20px;">
+                    <h5 class="text-primary">CETPRO Julio C. Tello</h5>
+                    <p class="mb-0 small">Urb. El Carmen Panamericana Sur Km 301 San Joaquín</p>
+                </div>
+            </div>
+
+            <!-- Sobre Nosotros -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="mb-3 text-primary">Sobre Nosotros</h5>
+                <p class="mb-3">El CETPRO "Julio C. Tello" es un centro de educación técnica productiva que forma estudiantes competentes para insertarlos en el mercado laboral.</p>
+                <p class="mb-3">Brindamos servicios educativos a personas mayores de 14 años que desean insertarse o reinsertarse en el mercado laboral con un nivel competitivo.</p>
+                <a href="#sobre-nosotros" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-history me-1"></i>Reseña Histórica
+                </a>
+            </div>
+
+            <!-- Direcciones -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="mb-3 text-primary">Ubicación:</h5>
+                <div class="mb-3">
+                    <i class="fas fa-map-marker-alt me-2 text-info"></i>
+                    <strong>Urb. El Carmen</strong><br>
+                    Panamericana Sur Km 301<br>
+                    San Joaquín, Ica, Perú
+                </div>
+                <div class="mb-3">
+                    <i class="fas fa-phone me-2 text-success"></i>
+                    <strong>956099016</strong>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-warning">Horario de Atención:</h6>
+                    <p class="mb-0"><strong>Lunes a Viernes:</strong> 8:00 am - 5:00 pm</p>
+                    <p class="mb-0"><strong>Turno Diurno:</strong> Mañana</p>
+                </div>
+            </div>
+
+            <!-- Programas de Estudios -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="mb-3 text-primary">Programas de Estudios</h5>
+                <div class="row g-2">
+                    <div class="col-6 text-center">
+                        <img src="{{ url_for('static', filename='images/Peluquería.jpeg') }}"
+                             alt="Estética Personal - Peluquería"
+                             class="img-fluid rounded"
+                             style="height: 120px; width: auto; object-fit: cover; display: block; margin: 0 auto;">
+                        <p class="small mt-1">Estética Personal</p>
+                    </div>
+                    <div class="col-6 text-center">
+                        <img src="{{ url_for('static', filename='images/Hostelería.jpeg') }}"
+                             alt="Hostelería y Turismo - Pastelería y Panadería"
+                             class="img-fluid rounded"
+                             style="height: 120px; width: auto; object-fit: cover; display: block; margin: 0 auto;">
+                        <p class="small mt-1">Hostelería y Turismo</p>
+                    </div>
+                    <div class="col-6 text-center">
+                        <img src="{{ url_for('static', filename='images/Manualidades.jpeg') }}"
+                             alt="Artesanía y Manualidades - Manualidades"
+                             class="img-fluid rounded"
+                             style="height: 120px; width: auto; object-fit: cover; display: block; margin: 0 auto;">
+                        <p class="small mt-1">Artesanía y Manualidades</p>
+                    </div>
+                    <div class="col-6 text-center">
+                        <img src="{{ url_for('static', filename='images/Confecciones.jpeg') }}"
+                             alt="Textiles y Confecciones - Confecciones Textiles"
+                             class="img-fluid rounded"
+                             style="height: 120px; width: auto; object-fit: cover; display: block; margin: 0 auto;">
+                        <p class="small mt-1">Textiles y Confecciones</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="row mt-5 pt-4 border-top border-secondary">
+            <div class="col-12 text-center">
+                <p class="mb-0">© 2025 CETPRO Julio C. Tello - Centro de Educación Técnica Productiva. Todos los Derechos Reservados</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de Inscripción -->
+<div class="modal fade" id="inscripcionModal" tabindex="-1" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="inscripcionModalLabel">
+                    <i class="fas fa-edit me-2"></i>Formulario de Inscripción en Línea
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('inscripcion') }}" method="POST" id="inscripcionForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombres" class="form-label">Nombres *</label>
+                                <input type="text" class="form-control" id="nombres" name="nombres" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="apellidos" class="form-label">Apellidos *</label>
+                                <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono *</label>
+                                <input type="number" class="form-control" id="telefono" name="telefono" min="900000000" max="999999999" title="Ingresa exactamente 9 dígitos empezando con 9" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="dni" class="form-label">DNI *</label>
+                                <input type="number" class="form-control" id="dni" name="dni" min="10000000" max="99999999" title="Ingresa exactamente 8 dígitos" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="programa" class="form-label">Programa de Interés *</label>
+                                <select class="form-select" id="programa" name="programa" required>
+                                    <option value="">Seleccionar programa...</option>
+                                    <option value="Estética Personal - Peluquería">Estética Personal - Peluquería</option>
+                                    <option value="Hostelería y Turismo - Pastelería y Panadería">Hostelería y Turismo - Pastelería y Panadería</option>
+                                    <option value="Artesanía y Manualidades - Manualidades">Artesanía y Manualidades - Manualidades</option>
+                                    <option value="Textiles y Confecciones - Confecciones Textiles">Textiles y Confecciones - Confecciones Textiles</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mensaje" class="form-label">Mensaje (opcional)</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="3" placeholder="Escribe aquí cualquier consulta o mensaje adicional..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Información importante:</strong> Al enviar este formulario, tu inscripción será procesada. Recibirás un correo de confirmación con los siguientes pasos del proceso de admisión.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="inscripcionForm" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar Inscripción
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver imágenes en tamaño completo -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true" data-bs-backdrop="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Imagen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="" class="img-fluid" style="max-height: 70vh;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="prevBtn" disabled>
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <button type="button" class="btn btn-secondary" id="nextBtn" disabled>
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentImages = [];
+    let currentIndex = 0;
+    let previousModal = null; // Track the modal that was open before image modal
+
+    // Función para abrir el modal de imagen
+    function openImageModal(images, index) {
+        // Store the currently open modal
+        const openModals = document.querySelectorAll('.modal.show');
+        if (openModals.length > 0) {
+            previousModal = openModals[0]; // Should be the program modal
+        }
+
+        currentImages = images;
+        currentIndex = index;
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = currentImages[currentIndex].src;
+        modalImage.alt = currentImages[currentIndex].alt;
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === currentImages.length - 1;
+
+        const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        modal.show();
+    }
+
+    // Event listener para las imágenes clickeables
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('[data-bs-toggle="modal"][data-bs-target="#imageModal"]')) {
+            e.preventDefault();
+            const clickedImg = e.target.closest('img');
+            const modal = clickedImg.closest('.modal');
+            const images = Array.from(modal.querySelectorAll('img[data-bs-toggle="modal"]'));
+            const index = images.indexOf(clickedImg);
+            openImageModal(images, index);
+        }
+    });
+
+    // Navegación anterior
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = currentImages[currentIndex].src;
+            modalImage.alt = currentImages[currentIndex].alt;
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = false;
+        }
+    });
+
+    // Navegación siguiente
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        if (currentIndex < currentImages.length - 1) {
+            currentIndex++;
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = currentImages[currentIndex].src;
+            modalImage.alt = currentImages[currentIndex].alt;
+            document.getElementById('nextBtn').disabled = currentIndex === currentImages.length - 1;
+            document.getElementById('prevBtn').disabled = false;
+        }
+    });
+
+    // Fix for persistent backdrop on modal close
+    document.getElementById('imageModal').addEventListener('hidden.bs.modal', function () {
+        // Force cleanup of all modal backdrops and body state
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => {
+            backdrop.remove();
+        });
+
+        // Reset body state completely
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        // Reset modal state for reuse
+        const modal = document.getElementById('imageModal');
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.removeAttribute('aria-modal');
+        modal.removeAttribute('role');
+
+        // Re-show the previous modal if it was open
+        if (previousModal) {
+            // Use setTimeout for reliable timing
+            setTimeout(() => {
+                // Final cleanup check
+                const remainingBackdrops = document.querySelectorAll('.modal-backdrop');
+                remainingBackdrops.forEach(backdrop => backdrop.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // Show the previous modal
+                const bsModal = new bootstrap.Modal(previousModal);
+                bsModal.show();
+            }, 150); // Slightly longer delay for complete cleanup
+        }
+        previousModal = null; // Reset for next use
+    });
+});
+</script>
+
+{% endblock %}

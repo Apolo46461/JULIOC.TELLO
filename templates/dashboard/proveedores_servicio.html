@@ -1,0 +1,319 @@
+{% extends "base_improved.html" %}
+{% block title %}Proveedores de Servicio - CETPRO Julio C. Tello{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+    .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-create { background: #28a745; border-color: #28a745; }
+    .btn-create:hover { background: #218838; border-color: #1e7e34; }
+    .table-responsive { border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .filter-section { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .status-badge { font-size: 0.85em; padding: 0.4em 0.8em; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary mb-0">
+                    <i class="fas fa-user-tie me-2"></i>Proveedores de Servicio
+                </h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#crearProveedorModal">
+                        <i class="fas fa-plus me-2"></i>Nuevo Proveedor
+                    </button>
+                    <a href="{{ url_for('dashboard_administrativo') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Filtros -->
+    <div class="filter-section">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="search" class="form-label">Buscar</label>
+                <input type="text" class="form-control" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Nombre o contacto...">
+            </div>
+            <div class="col-md-2">
+                <label for="especialidad" class="form-label">Especialidad</label>
+                <select class="form-select" id="especialidad" name="especialidad">
+                    <option value="">Todas</option>
+                    <option value="Mantenimiento Eléctrico" {% if request.args.get('especialidad') == 'Mantenimiento Eléctrico' %}selected{% endif %}>Mantenimiento Eléctrico</option>
+                    <option value="Mantenimiento Mecánico" {% if request.args.get('especialidad') == 'Mantenimiento Mecánico' %}selected{% endif %}>Mantenimiento Mecánico</option>
+                    <option value="Reparación de Equipos Informáticos" {% if request.args.get('especialidad') == 'Reparación de Equipos Informáticos' %}selected{% endif %}>Reparación de Equipos Informáticos</option>
+                    <option value="Limpieza y Suministros" {% if request.args.get('especialidad') == 'Limpieza y Suministros' %}selected{% endif %}>Limpieza y Suministros</option>
+                    <option value="Seguridad y Vigilancia" {% if request.args.get('especialidad') == 'Seguridad y Vigilancia' %}selected{% endif %}>Seguridad y Vigilancia</option>
+                    <option value="Otros" {% if request.args.get('especialidad') == 'Otros' %}selected{% endif %}>Otros</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="estado" class="form-label">Estado</label>
+                <select class="form-select" id="estado" name="estado">
+                    <option value="">Todos</option>
+                    <option value="activo" {% if request.args.get('estado') == 'activo' %}selected{% endif %}>Activo</option>
+                    <option value="inactivo" {% if request.args.get('estado') == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="ciudad" class="form-label">Ciudad</label>
+                <input type="text" class="form-control" id="ciudad" name="ciudad" value="{{ request.args.get('ciudad', '') }}" placeholder="e.g., Ica">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Aplicar Filtros
+                </button>
+            </div>
+        </form>
+        {% if request.args %}
+            <div class="mt-2">
+                <a href="{{ url_for('admin_proveedores') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times me-1"></i>Limpiar Filtros
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-user-tie fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ proveedores|length }}</h5>
+                    <p class="card-text">Total Proveedores</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ proveedores|selectattr('estado', 'equalto', 'activo')|list|length }}</h5>
+                    <p class="card-text">Activos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <i class="fas fa-pause-circle fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ proveedores|selectattr('estado', 'equalto', 'inactivo')|list|length }}</h5>
+                    <p class="card-text">Inactivos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-tools fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ proveedores|map(attribute='especialidad')|unique|list|length }}</h5>
+                    <p class="card-text">Especialidades</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Proveedores -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lista de Proveedores</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Contacto</th>
+                            <th>Especialidad</th>
+                            <th>Teléfono</th>
+                            <th>Ciudad</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for proveedor in proveedores %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <strong>{{ proveedor.nombre }}</strong>
+                                {% if proveedor.descripcion %}
+                                <br><small class="text-muted">{{ proveedor.descripcion[:50] }}...</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ proveedor.contacto }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ proveedor.especialidad }}</span>
+                            </td>
+                            <td><a href="tel:{{ proveedor.telefono }}">{{ proveedor.telefono }}</a></td>
+                            <td>{{ proveedor.ciudad or 'No especificada' }}</td>
+                            <td>
+                                <span class="badge {{ 'bg-success' if proveedor.estado == 'activo' else 'bg-danger' }} status-badge">
+                                    {{ 'Activo' if proveedor.estado == 'activo' else 'Inactivo' }}
+                                </span>
+                            </td>
+                            <td>{{ proveedor.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('admin_proveedores_detalles', id=proveedor.id) }}" class="btn btn-outline-info" title="Detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_proveedores_edit', id=proveedor.id) }}" class="btn btn-outline-primary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin_proveedores_delete', id=proveedor.id) }}" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar este proveedor?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                <p>No hay proveedores registrados aún.</p>
+                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearProveedorModal">
+                                    <i class="fas fa-plus me-2"></i>Crear Primer Proveedor
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Crear Proveedor -->
+    <div class="modal fade" id="crearProveedorModal" tabindex="-1" aria-labelledby="crearProveedorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="POST" action="{{ url_for('admin_proveedores') }}">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="crearProveedorModalLabel">
+                            <i class="fas fa-plus me-2"></i>Nuevo Proveedor de Servicio
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre del Proveedor *</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" required placeholder="e.g., ElectroServicios SAC">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contacto" class="form-label">Contacto *</label>
+                                    <input type="text" class="form-control" id="contacto" name="contacto" required placeholder="e.g., Juan Pérez">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="especialidad" class="form-label">Especialidad *</label>
+                                    <select class="form-select" id="especialidad" name="especialidad" required>
+                                        <option value="">Seleccionar especialidad...</option>
+                                        <option value="Mantenimiento Eléctrico">Mantenimiento Eléctrico</option>
+                                        <option value="Mantenimiento Mecánico">Mantenimiento Mecánico</option>
+                                        <option value="Reparación de Equipos Informáticos">Reparación de Equipos Informáticos</option>
+                                        <option value="Limpieza y Suministros">Limpieza y Suministros</option>
+                                        <option value="Seguridad y Vigilancia">Seguridad y Vigilancia</option>
+                                        <option value="Otros">Otros</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" required placeholder="e.g., 999-123-456">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="e.g., contacto@proveedor.com">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ciudad" class="form-label">Ciudad</label>
+                                    <input type="text" class="form-control" id="ciudad" name="ciudad" placeholder="e.g., Ica">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección completa del proveedor">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Breve descripción de los servicios ofrecidos..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado Inicial</label>
+                            <select class="form-select" id="estado" name="estado">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Crear Proveedor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-focus en modal
+    document.addEventListener('DOMContentLoaded', function() {
+        var crearModal = document.getElementById('crearProveedorModal');
+        crearModal.addEventListener('shown.bs.modal', function () {
+            document.getElementById('nombre').focus();
+        });
+    });
+
+    // Confirmación para eliminación
+    document.querySelectorAll('form[action*="delete"]').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este proveedor? Esta acción no se puede deshacer.')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

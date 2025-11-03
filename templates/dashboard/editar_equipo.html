@@ -1,0 +1,114 @@
+{% extends "base_improved.html" %}
+
+{% block title %}Editar Equipo - Dashboard Administrativo{% endblock %}
+
+{% block page_title %}Editar Equipo{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Equipo #{{ equipo.id }} - {{ equipo.nombre }}
+                </h2>
+                <a href="{{ url_for('admin_equipos') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver a Equipos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Detalles del Equipo</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre del Equipo <span class="text-danger">*</span></label>
+                            <input type="text" name="nombre" id="nombre" class="form-control" value="{{ equipo.nombre }}" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="tipo" class="form-label">Tipo <span class="text-danger">*</span></label>
+                                <select name="tipo" id="tipo" class="form-select" required>
+                                    <option value="herramienta" {% if equipo.tipo == 'herramienta' %}selected{% endif %}>Herramienta</option>
+                                    <option value="maquinaria" {% if equipo.tipo == 'maquinaria' %}selected{% endif %}>Maquinaria</option>
+                                    <option value="mobiliario" {% if equipo.tipo == 'mobiliario' %}selected{% endif %}>Mobiliario</option>
+                                    <option value="otro" {% if equipo.tipo == 'otro' %}selected{% endif %}>Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="estado" class="form-label">Estado</label>
+                                <select name="estado" id="estado" class="form-select">
+                                    <option value="disponible" {% if equipo.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                                    <option value="en uso" {% if equipo.estado == 'en uso' %}selected{% endif %}>En uso</option>
+                                    <option value="mantenimiento" {% if equipo.estado == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ubicacion" class="form-label">Ubicación <span class="text-danger">*</span></label>
+                            <input type="text" name="ubicacion" id="ubicacion" class="form-control" value="{{ equipo.ubicacion }}" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="fecha_adquisicion" class="form-label">Fecha Adquisición <span class="text-danger">*</span></label>
+                                <input type="date" name="fecha_adquisicion" id="fecha_adquisicion" class="form-control" value="{{ equipo.fecha_adquisicion.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="costo" class="form-label">Costo (S/.)</label>
+                                <input type="number" name="costo" id="costo" class="form-control" step="0.01" min="0" value="{{ equipo.costo }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea name="descripcion" id="descripcion" class="form-control" rows="4">{{ equipo.descripcion or '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Actualizar Equipo
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Información General</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> {{ equipo.id }}</p>
+                    <p><strong>Nombre:</strong> {{ equipo.nombre }}</p>
+                    <p><strong>Tipo:</strong> <span class="badge bg-info">{{ equipo.tipo }}</span></p>
+                    <p><strong>Estado Actual:</strong> 
+                        <span class="badge bg-{% if equipo.estado == 'disponible' %}success
+                            {% elif equipo.estado == 'en uso' %}warning
+                            {% else %}danger{% endif %}">{{ equipo.estado }}</span>
+                    </p>
+                    <p><strong>Ubicación:</strong> {{ equipo.ubicacion }}</p>
+                    <p><strong>Fecha Adquisición:</strong> {{ equipo.fecha_adquisicion.strftime('%d/%m/%Y') }}</p>
+                    <p><strong>Costo:</strong> S/. {{ "%.2f"|format(equipo.costo) }}</p>
+                    <p><strong>Creado:</strong> {{ equipo.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <p><strong>Actualizado:</strong> {{ equipo.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <hr>
+                    <p class="mb-1"><strong>Mantenimientos:</strong></p>
+                    <small class="text-muted">
+                        {% if equipo.mantenimientos %}
+                            {{ equipo.mantenimientos|length }} mantenimientos registrados
+                            <a href="{{ url_for('admin_mantenimiento_equipos') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="fas fa-list me-1"></i>Ver Historial
+                            </a>
+                        {% else %}
+                            No hay mantenimientos programados
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

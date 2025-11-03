@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}I.E. CETPRO JULIO C. TELLO{% endblock %}</title>
+
+    <!-- Favicon usando el logo del CETPRO -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.jpg') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.jpg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo.jpg') }}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        /* Base styles for landing page */
+        body {
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Ensure no sidebar interference */
+        .sidebar, .main-content, .toggle-btn {
+            display: none !important;
+        }
+
+        /* Full width for landing page */
+        .container-fluid {
+            width: 100%;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

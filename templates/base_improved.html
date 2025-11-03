@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}I.E. CETPRO JULIO C. TELLO{% endblock %}</title>
+
+    <!-- Favicon usando el logo del CETPRO -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.jpg') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.jpg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo.jpg') }}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        .sidebar-menu li {
+            position: relative;
+        }
+
+        .sidebar-menu > li > a {
+            display: block;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu > li > a:hover,
+        .sidebar-menu > li > a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #fff;
+        }
+
+        .sidebar-menu .fas {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: rgba(0,0,0,0.1);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-submenu.active {
+            max-height: 300px;
+        }
+
+        .sidebar-submenu a {
+            display: block;
+            padding: 10px 20px 10px 50px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-submenu a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 60px;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 290px;
+            z-index: 1001;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: left 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .toggle-btn.collapsed {
+            left: 70px;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info .user-role {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .card-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card-stats:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .module-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .module-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .module-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+    {% block extra_slider_style %}{% endblock %}
+</head>
+<body>
+    {# Sidebar solo si existe 'navegacion' #}
+    {% if navegacion is defined %}
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="sidebar-title">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="sidebar-text">I.E. CEPTRO JULIO C. TELLO</span>
+            </h4>
+        </div>
+        <ul class="sidebar-menu">
+            {% for modulo_key, modulo in navegacion.modulos.items() %}
+                <li>
+                    {% if modulo.submodulos %}
+                        <a href="#" class="menu-toggle" data-target="submenu-{{ modulo_key }}">
+                            <i class="{{ modulo.icono }}"></i>
+                            <span class="sidebar-text">{{ modulo.nombre }}</span>
+                            <i class="fas fa-chevron-down float-end mt-1"></i>
+                        </a>
+                        <ul class="sidebar-submenu" id="submenu-{{ modulo_key }}">
+                            {% for sub_key, submodulo in modulo.submodulos.items() %}
+                                <li><a href="{{ submodulo.url }}"><span class="sidebar-text">{{ submodulo.nombre }}</span></a></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <a href="{{ modulo.url }}" class="{% if request.endpoint == modulo.url[1:] %}active{% endif %}">
+                            <i class="{{ modulo.icono }}"></i>
+                            <span class="sidebar-text">{{ modulo.nombre }}</span>
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="user-info">
+            <div class="user-name">{{ current_user.nombre_completo if current_user.is_authenticated else '' }}</div>
+            <div class="user-role">{{ current_user.role if current_user.is_authenticated else '' }}</div>
+        </div>
+    </nav>
+    {% endif %}
+
+
+    <!-- Toggle Button -->
+    <button class="toggle-btn" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">{% block page_title %}{{ navegacion.titulo if navegacion is defined else 'Bienvenido' }}{% endblock %}</h2>
+            <div class="d-flex align-items-center">
+                <span class="me-3">{% if current_user.is_authenticated %}{{ current_user.nombre_completo }}{% endif %}</span>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="container-fluid">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleBtn = document.getElementById('toggleSidebar');
+
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            toggleBtn.classList.toggle('collapsed');
+
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.className = 'fas fa-bars';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+
+        // Toggle submenus
+        document.querySelectorAll('.menu-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target');
+                const submenu = document.getElementById(targetId);
+
+                submenu.classList.toggle('active');
+
+                const icon = this.querySelector('.fa-chevron-down');
+                if (submenu.classList.contains('active')) {
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
